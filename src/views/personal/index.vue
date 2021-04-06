@@ -42,17 +42,156 @@
             <div slot="header" class="clearfix">
               <span>我的订单</span>
             </div>
-            <el-tabs @tab-click="handleClick" style="background-color: #E4E7ED">
-              <el-tab-pane label="全部订单" name="first" style="background-color: #E4E7ED">
-                <order></order>
+            <el-tabs v-model="activePane" @tab-click="tabclick" style="background-color: #E4E7ED">
+              <el-tab-pane label="全部订单" name="all" style="background-color: #E4E7ED">
+                <el-table
+                  :data="orderList"
+                  style="width: 100%;background-color: #E4E7ED">
+                  <el-table-column
+                    prop="orderNo"
+                    label="订单号"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="shopName"
+                    label="回收站"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageWeight"
+                    label="废品重量">
+                  </el-table-column>
+                  <el-table-column
+                    prop="amount"
+                    label="废品金额">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageType"
+                    label="废品属性">
+                  </el-table-column>
+                  <el-table-column
+                    prop="address"
+                    label="回收地址">
+                  </el-table-column>
+                  <el-table-column
+                    prop="createTime"
+                    label="回收时间">
+                  </el-table-column>
+                  <el-table-column
+                    fixed="right"
+                    width="100">
+                    <template slot-scope="scope">
+                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
               </el-tab-pane>
-              <el-tab-pane label="未完成" name="second">
-                <order></order>
+              <el-tab-pane label="未完成" name="undo">
+                <el-table
+                  :data="orderList"
+                  style="width: 100%;background-color: #E4E7ED">
+                  <el-table-column
+                    prop="orderNo"
+                    label="订单号"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="shopName"
+                    label="回收站"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageWeight"
+                    label="废品重量">
+                  </el-table-column>
+                  <el-table-column
+                    prop="amount"
+                    label="废品金额">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageType"
+                    label="废品属性">
+                  </el-table-column>
+                  <el-table-column
+                    prop="address"
+                    label="回收地址">
+                  </el-table-column>
+                  <el-table-column
+                    prop="createTime"
+                    label="回收时间">
+                  </el-table-column>
+                  <el-table-column
+                    fixed="right"
+                    width="100">
+                    <template slot-scope="scope">
+                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
               </el-tab-pane>
-              <el-tab-pane label="已完成" name="third">
-                <order></order>
+              <el-tab-pane label="已完成" name="finish">
+                <el-table
+                  :data="orderList"
+                  style="width: 100%;background-color: #E4E7ED">
+                  <el-table-column
+                    prop="orderNo"
+                    label="订单号"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="shopName"
+                    label="回收站"
+                    width="180">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageWeight"
+                    label="废品重量">
+                  </el-table-column>
+                  <el-table-column
+                    prop="amount"
+                    label="废品金额">
+                  </el-table-column>
+                  <el-table-column
+                    prop="garbageType"
+                    label="废品属性">
+                  </el-table-column>
+                  <el-table-column
+                    prop="address"
+                    label="回收地址">
+                  </el-table-column>
+                  <el-table-column
+                    prop="createTime"
+                    label="回收时间">
+                  </el-table-column>
+                  <el-table-column
+                    fixed="right"
+                    width="100">
+                    <template slot-scope="scope">
+                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
               </el-tab-pane>
             </el-tabs>
+            <el-dialog title="评论" :visible.sync="dialogCommentVisible" width="50%" :show-close=false :modal=false center>
+              <el-form>
+                <el-form-item label="评分:">
+                  <el-rate v-model="commentForm.score" style="margin-top: 10px;"></el-rate>
+                </el-form-item>
+                <el-form-item label="活动区域">
+                  <el-input
+                    type="textarea"
+                    :rows="4"
+                    placeholder="请输入内容"
+                    v-model="commentForm.content">
+                  </el-input>
+                </el-form-item>
+              </el-form>
+              <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogCommentVisible = false">取 消</el-button>
+                <el-button type="primary" @click.native="submitComment()">确 定</el-button>
+              </div>
+            </el-dialog>
           </el-card>
         </el-col>
       </el-row>
@@ -61,15 +200,57 @@
 
 <script>
 
-    import Order from "./order";
+    import { getOrders } from '@/api/order'
     import { personalDetail } from '@/api/user'
+    import { addComment } from '@/api/comment'
     export default {
         name: 'Personal',
-        components: {Order},
         data(){
             return {
+                commentForm: {},
+                dialogCommentVisible: false,
+                activePane: 'all',
                 userInfo: {},
-                url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+                url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg',
+                orderList: [],
+                order: {}
+            }
+        },
+        methods: {
+            tabclick(){
+                const userOrderReq = {
+                    range: this.activePane,
+                    userId: ''
+                }
+                getOrders(userOrderReq).then(response => {
+                    if (response.code === '000000'){
+                        this.orderList = response.data
+                    }
+                })
+            },
+            commentclick(order){
+                this.dialogCommentVisible = true
+                this.order = order
+                console.log(this.order)
+            },
+            submitComment(){
+              const commentReq = {
+                  orderNo: this.order.orderNo,
+                  shopId: this.order.shopId,
+                  userId: this.order.userId,
+                  score: this.commentForm.score,
+                  content: this.commentForm.content
+              }
+                addComment(commentReq).then(response => {
+                    if (response.code !== '000000'){
+                        this.$message({
+                            message: response.msg,
+                            type: "error"
+                        });
+                    } else {
+                        this.dialogCommentVisible = false
+                    }
+                })
             }
         },
         created() {
@@ -78,6 +259,15 @@
                   this.userInfo = response.data
               }
           })
+            const userOrderReq = {
+              range: this.activePane,
+              userId: ''
+            }
+            getOrders(userOrderReq).then(response => {
+                if (response.code === '000000'){
+                    this.orderList = response.data
+                }
+            })
         }
     }
 </script>

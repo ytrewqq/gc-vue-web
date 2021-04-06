@@ -1,16 +1,16 @@
 import request from '@/utils/request'
 
-export function getOrders(data) {
+export function getComments(data) {
   return request({
-    url: '/order/userOrder',
+    url: '/comment/list',
     method: 'post',
     data: data
   })
 }
 
-export function addOrder(data) {
+export function addComment(data) {
   return request({
-    url: '/order/save',
+    url: '/comment/save',
     method: 'post',
     data: data
   })

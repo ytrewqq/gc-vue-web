@@ -48,7 +48,7 @@
 </template>
 
 <script>
-    import { addShop } from '@/api/order'
+    import { addOrder } from '@/api/order'
     export default {
         name: "CollectionForm",
         data() {
@@ -90,7 +90,7 @@
                     address: this.orderForm.address,
                     delivery: this.orderForm.delivery
                 }
-                addShop(addForm).then(response => {
+                addOrder(addForm).then(response => {
                     if (response.code === '000000'){
                         this.$router.push(`/collection/index`)
                     } else {
