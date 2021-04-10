@@ -15,3 +15,11 @@ export function addOrder(data) {
     data: data
   })
 }
+
+export function updateOrder(data) {
+  return request({
+    url: '/order/updatestatus',
+    method: 'post',
+    data: data
+  })
+}

@@ -1,6 +1,6 @@
 <template>
   <div :class="classObj" class="app-wrapper">
-    <div class="main-container">
+    <div >
       <navbar />
       <app-main />
     </div>
@@ -52,6 +52,7 @@ export default {
     position: relative;
     height: 100%;
     width: 100%;
+    background-color: #E4E7ED;
     &.mobile.openSidebar{
       position: fixed;
       top: 0;

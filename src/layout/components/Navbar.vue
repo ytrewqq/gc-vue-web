@@ -15,27 +15,35 @@
         <i class="el-icon-takeaway-box"></i>
         <span slot="title">垃圾回收</span>
       </el-menu-item>
-      <el-menu-item index="3" class="nav-el-menu-item" @click.native="classify">
-        <i class="el-icon-search"></i>
-        <span slot="title">垃圾分类</span>
-      </el-menu-item>
       <el-menu-item index="4" class="nav-el-menu-item" @click.native="personal">
         <i class="el-icon-user"></i>
         <span slot="title">个人中心</span>
       </el-menu-item>
     </el-menu>
+    <div style="float:right;margin-top: 20px; margin-right: 100px;">
+      <el-link v-if="islogin === false" type="success" @click="handleLogin">登录</el-link>
+      <el-link v-if="islogin === true" type="success" @click="logout">退出登录</el-link>
+    </div>
   </div>
 </template>
 
 <script>
-
+    import { getToken } from '@/utils/auth'
     export default {
         data() {
             return {
-                activeIndex: '1'
+                activeIndex: '1',
+                islogin: false
             };
         },
         methods: {
+            handleLogin(){
+                this.$router.push('/login')
+            },
+            async logout() {
+                await this.$store.dispatch('user/logout')
+                this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+            },
             home(){
                 this.$router.push(`/home`)
             },
@@ -43,14 +51,20 @@
                 this.$router.push(`/collection/index`)
                 this.activeIndex = 2
             },
-            classify(){
-                this.$router.push(`/classify/index`)
-                this.activeIndex = 3
-            },
             personal(){
                 this.$router.push(`/personal/index`)
                 this.activeIndex = 4
             },
+        },
+        created() {
+            const hasToken = getToken()
+            console.log(hasToken)
+            if (hasToken) {
+                this.islogin = true;
+            } else {
+                this.islogin = false
+            }
+            console.log(this.islogin)
         }
     }
 </script>

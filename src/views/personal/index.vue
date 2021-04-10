@@ -70,6 +70,10 @@
                     label="废品属性">
                   </el-table-column>
                   <el-table-column
+                    prop="orderStatusDesc"
+                    label="点单状态">
+                  </el-table-column>
+                  <el-table-column
                     prop="address"
                     label="回收地址">
                   </el-table-column>
@@ -81,7 +85,9 @@
                     fixed="right"
                     width="100">
                     <template slot-scope="scope">
-                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                      <el-button v-if="scope.row.orderStatus === 1 || scope.row.orderStatus === 2" @click="updateOrderStatus(scope.row,6)" type="text" size="small">取消</el-button>
+                      <el-button v-if="scope.row.orderStatus === 4" @click="updateOrderStatus(scope.row,5)" type="text" size="small">确认完成</el-button>
+                      <el-button v-if="scope.row.orderStatus === 5" @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -117,6 +123,10 @@
                     label="回收地址">
                   </el-table-column>
                   <el-table-column
+                    prop="orderStatusDesc"
+                    label="点单状态">
+                  </el-table-column>
+                  <el-table-column
                     prop="createTime"
                     label="回收时间">
                   </el-table-column>
@@ -124,7 +134,8 @@
                     fixed="right"
                     width="100">
                     <template slot-scope="scope">
-                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                      <el-button v-if="scope.row.orderStatus === 1 || scope.row.orderStatus === 2" @click="updateOrderStatus(scope.row,6)" type="text" size="small">取消</el-button>
+                      <el-button v-if="scope.row.orderStatus === 4" @click="updateOrderStatus(scope.row,5)" type="text" size="small">确认完成</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -160,6 +171,10 @@
                     label="回收地址">
                   </el-table-column>
                   <el-table-column
+                    prop="orderStatusDesc"
+                    label="点单状态">
+                  </el-table-column>
+                  <el-table-column
                     prop="createTime"
                     label="回收时间">
                   </el-table-column>
@@ -167,7 +182,7 @@
                     fixed="right"
                     width="100">
                     <template slot-scope="scope">
-                      <el-button @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
+                      <el-button v-if="scope.row.orderStatus === 5" @click="commentclick(scope.row)" type="text" size="small">评论</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -200,7 +215,7 @@
 
 <script>
 
-    import { getOrders } from '@/api/order'
+    import { getOrders,updateOrder } from '@/api/order'
     import { personalDetail } from '@/api/user'
     import { addComment } from '@/api/comment'
     export default {
@@ -217,6 +232,15 @@
             }
         },
         methods: {
+            updateOrderStatus(row,status){
+                const req = row
+                row.orderStatus = status
+                updateOrder(req).then(response => {
+                    if (response.code === '000000'){
+                        this.tabclick()
+                    }
+                })
+            },
             tabclick(){
                 const userOrderReq = {
                     range: this.activePane,
@@ -231,7 +255,6 @@
             commentclick(order){
                 this.dialogCommentVisible = true
                 this.order = order
-                console.log(this.order)
             },
             submitComment(){
               const commentReq = {

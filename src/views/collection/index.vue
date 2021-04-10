@@ -88,6 +88,10 @@
       width: 1280px;
       padding-top: 0px;
 
+      .collection-shop-list{
+        margin-right: 20px;
+      }
+
       .shop-list-attr{
         height: 70px;
         padding-left: 10px;

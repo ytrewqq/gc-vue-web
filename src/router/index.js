@@ -75,17 +75,6 @@ export const constantRoutes = [
         component: () => import('@/views/collection/shopDetail')
       }]
   },
-  {
-    path: '/classify',
-    component: Layout,
-    redirect: '/index',
-    children: [{
-      path: 'index',
-      name: 'Classify',
-      component: () => import('@/views/classify/index'),
-      meta: { title: '垃圾分类', icon: 'table' }
-    }]
-  },
 
   {
     path: '/personal',
